@@ -1,3 +1,4 @@
+<rect x="0" y="0" width="1" height="0.866" fill="white" />
 import React, { useState } from 'react';
 
 const App = () => {
