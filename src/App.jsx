@@ -1,44 +1,66 @@
-import React from "react";
-import { slagSamples } from "./data";
+import React, { useState } from 'react';
+import triangle from './assets/triangle.jpg';
 
-const triangleSize = 300;
-
-function ternaryToXY(ca, si, al) {
-  const total = ca + si + al;
-  const x = (0.5 * (2 * si + al)) / total;
-  const y = (Math.sqrt(3) * al) / total;
-  return {
-    x: x * triangleSize,
-    y: (1 - y) * triangleSize
-  };
-}
+const initialPoints = [
+  { label: '水砕/フレッシュ', x: 0.5, y: 0.4, visible: true },
+  { label: 'ISCスラグ①', x: 0.25, y: 0.2, visible: true },
+  { label: '調整池', x: 0.22, y: 0.25, visible: true },
+  { label: '低Pスラグ①', x: 0.15, y: 0.1, visible: true },
+  { label: '製鋼/低塩基度', x: 0.6, y: 0.1, visible: true }
+];
 
 function App() {
+  const [points, setPoints] = useState(initialPoints);
+
+  const togglePoint = (index) => {
+    const updated = [...points];
+    updated[index].visible = !updated[index].visible;
+    setPoints(updated);
+  };
+
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <div style={{ fontFamily: 'sans-serif', padding: '1rem', textAlign: 'center' }}>
       <h1>三元系スラグ状態図（CaO–SiO₂–Al₂O₃）</h1>
-      <svg width={triangleSize} height={triangleSize} style={{ border: "1px solid #ccc" }}>
-        <polygon
-          points={`${triangleSize / 2},0 0,${triangleSize} ${triangleSize},${triangleSize}`}
-          fill="#f0f8ff"
-          stroke="#888"
-          strokeWidth="2"
+      <div style={{ marginBottom: '1rem' }}>
+        {points.map((p, i) => (
+          <label key={i} style={{ marginRight: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={p.visible}
+              onChange={() => togglePoint(i)}
+            />{' '}
+            {p.label}
+          </label>
+        ))}
+      </div>
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+        <img
+          src={triangle}
+          alt="三元系状態図"
+          style={{ width: '400px', height: 'auto', border: '1px solid #ccc' }}
         />
-        {slagSamples.map((sample, index) => {
-          const { x, y } = ternaryToXY(sample.CaO, sample.SiO2, sample.Al2O3);
-          return (
-            <g key={index}>
-              <circle cx={x} cy={y} r="5" fill="steelblue" />
-              <text x={x + 5} y={y - 5} fontSize="10" fill="#333">
-                {sample.name}
-              </text>
-            </g>
-          );
-        })}
-        <text x={triangleSize / 2 - 20} y={-5} fontSize="12">SiO₂ 100%</text>
-        <text x={-5} y={triangleSize + 15} fontSize="12">CaO 100%</text>
-        <text x={triangleSize - 40} y={triangleSize + 15} fontSize="12">Al₂O₃ 100%</text>
-      </svg>
+        {points.map((p, i) =>
+          p.visible ? (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${p.x * 400}px`,
+                top: `${p.y * 400}px`,
+                transform: 'translate(-50%, -50%)',
+                background: 'blue',
+                borderRadius: '50%',
+                width: '12px',
+                height: '12px',
+                border: '2px solid white',
+                cursor: 'pointer',
+                title: p.label
+              }}
+              title={p.label}
+            />
+          ) : null
+        )}
+      </div>
     </div>
   );
 }
