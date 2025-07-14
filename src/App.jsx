@@ -25,8 +25,8 @@ const App = () => {
   };
 
   const ternaryToCartesian = ({ cao, sio2, al2o3 }) => {
-    const x = 0.5 * (2 * cao + al2o3) / (cao + sio2 + al2o3);
-    const y = (Math.sqrt(3) / 2) * al2o3 / (cao + sio2 + al2o3);
+    const x = 0.5 * (2 * cao + al2o3);
+    const y = (Math.sqrt(3) / 2) * al2o3;
     return { x, y };
   };
 
@@ -40,16 +40,28 @@ const App = () => {
         <input placeholder="Al₂O₃ (%)" value={al2o3} onChange={e => setAl2o3(e.target.value)} />
         <button onClick={handleAdd}>追加</button>
       </div>
-      <svg viewBox="0 0 1 0.866" width="500" height="433" style={{ border: '1px solid #ccc' }}>
+
+      <svg
+        viewBox="0 0 1 0.866"
+        width="500"
+        height="433"
+        style={{ backgroundColor: 'white', border: '1px solid gray' }}
+      >
         {/* 三角形エリア */}
-        <polygon points="0,0 1,0 0.5,0.866" fill="#eef6ff" stroke="black" />
+        <polygon points="0,0 1,0 0.5,0.866" fill="#f0f8ff" stroke="black" />
 
         {/* 軸ラベル */}
-        <text x="0.5" y="-0.02" textAnchor="middle" fontSize="0.025" transform="translate(0,0.03)">Al₂O₃ (%)</text>
-        <text x="0" y="0.02" fontSize="0.025">SiO₂ (%)</text>
-        <text x="1" y="0.02" textAnchor="end" fontSize="0.025">CaO (%)</text>
+        <text x="0.5" y="-0.02" textAnchor="middle" fontSize="0.025" transform="translate(0,0.03)">
+          Al₂O₃ (%)
+        </text>
+        <text x="0" y="0.02" fontSize="0.025">
+          SiO₂ (%)
+        </text>
+        <text x="1" y="0.02" textAnchor="end" fontSize="0.025">
+          CaO (%)
+        </text>
 
-        {/* データ点とラベル */}
+        {/* プロットデータ */}
         {points.map((point, index) => {
           const { x, y } = ternaryToCartesian(point);
           return (
