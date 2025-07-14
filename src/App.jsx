@@ -1,63 +1,111 @@
 import React, { useState } from 'react';
-import triangle from './assets/triangle.jpg';
 
 const initialPoints = [
-  { label: '水砕/フレッシュ', x: 0.5, y: 0.4, visible: true },
-  { label: 'ISCスラグ①', x: 0.25, y: 0.2, visible: true },
-  { label: '調整池', x: 0.22, y: 0.25, visible: true },
-  { label: '低Pスラグ①', x: 0.15, y: 0.1, visible: true },
-  { label: '製鋼/低塩基度', x: 0.6, y: 0.1, visible: true }
+  { label: '水砕/フレッシュ', x: 50, y: 30, visible: true },
+  { label: '調整池', x: 30, y: 70, visible: true },
+  { label: 'ISCスラグ①', x: 35, y: 75, visible: true },
+  { label: '低Pスラグ①', x: 25, y: 85, visible: true },
+  { label: '製鋼/低塩基度', x: 60, y: 80, visible: true },
 ];
 
 function App() {
   const [points, setPoints] = useState(initialPoints);
+  const [newLabel, setNewLabel] = useState('');
+  const [newX, setNewX] = useState('');
+  const [newY, setNewY] = useState('');
 
-  const togglePoint = (index) => {
-    const updated = [...points];
-    updated[index].visible = !updated[index].visible;
-    setPoints(updated);
+  const handleToggleVisibility = (index) => {
+    const updatedPoints = [...points];
+    updatedPoints[index].visible = !updatedPoints[index].visible;
+    setPoints(updatedPoints);
+  };
+
+  const handleAddPoint = () => {
+    if (newLabel && !isNaN(newX) && !isNaN(newY)) {
+      setPoints([
+        ...points,
+        {
+          label: newLabel,
+          x: parseFloat(newX),
+          y: parseFloat(newY),
+          visible: true,
+        },
+      ]);
+      setNewLabel('');
+      setNewX('');
+      setNewY('');
+    }
   };
 
   return (
-    <div style={{ fontFamily: 'sans-serif', padding: '1rem', textAlign: 'center' }}>
+    <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'sans-serif' }}>
       <h1>三元系スラグ状態図（CaO–SiO₂–Al₂O₃）</h1>
+
       <div style={{ marginBottom: '1rem' }}>
-        {points.map((p, i) => (
-          <label key={i} style={{ marginRight: '1rem' }}>
+        <input
+          type="text"
+          placeholder="ラベル"
+          value={newLabel}
+          onChange={(e) => setNewLabel(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="X(%)"
+          value={newX}
+          onChange={(e) => setNewX(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Y(%)"
+          value={newY}
+          onChange={(e) => setNewY(e.target.value)}
+        />
+        <button onClick={handleAddPoint}>追加</button>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+        {points.map((pt, idx) => (
+          <label key={idx} style={{ margin: '0 10px' }}>
             <input
               type="checkbox"
-              checked={p.visible}
-              onChange={() => togglePoint(i)}
-            />{' '}
-            {p.label}
+              checked={pt.visible}
+              onChange={() => handleToggleVisibility(idx)}
+            />
+            {pt.label}
           </label>
         ))}
       </div>
-      <div style={{ position: 'relative', display: 'inline-block' }}>
-        <img
-          src={triangle}
-          alt="三元系状態図"
-          style={{ width: '400px', height: 'auto', border: '1px solid #ccc' }}
-        />
-        {points.map((p, i) =>
-          p.visible ? (
+
+      <div
+        style={{
+          position: 'relative',
+          width: '500px',
+          height: '500px',
+          margin: '0 auto',
+          backgroundImage: 'url("/triangle.jpg")',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          border: '1px solid #ccc',
+        }}
+      >
+        {points.map((pt, idx) =>
+          pt.visible ? (
             <div
-              key={i}
+              key={idx}
               style={{
                 position: 'absolute',
-                left: `${p.x * 400}px`,
-                top: `${p.y * 400}px`,
+                left: `${pt.x}%`,
+                top: `${pt.y}%`,
                 transform: 'translate(-50%, -50%)',
                 background: 'blue',
-                borderRadius: '50%',
-                width: '12px',
-                height: '12px',
-                border: '2px solid white',
-                cursor: 'pointer',
-                title: p.label
+                color: 'white',
+                padding: '2px 5px',
+                borderRadius: '4px',
+                fontSize: '12px',
               }}
-              title={p.label}
-            />
+            >
+              {pt.label}
+            </div>
           ) : null
         )}
       </div>
