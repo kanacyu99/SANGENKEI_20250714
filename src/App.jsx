@@ -1,114 +1,93 @@
 import React, { useState } from 'react';
 
 const initialPoints = [
-  { label: '水砕/フレッシュ', x: 50, y: 30, visible: true },
-  { label: '調整池', x: 30, y: 70, visible: true },
-  { label: 'ISCスラグ①', x: 35, y: 75, visible: true },
-  { label: '低Pスラグ①', x: 25, y: 85, visible: true },
-  { label: '製鋼/低塩基度', x: 60, y: 80, visible: true },
+  { label: '水砕/フレッシュ', x: 33, y: 33, visible: true },
+  { label: '調整池', x: 25, y: 20, visible: true },
+  { label: 'ISCスラグ①', x: 27, y: 18, visible: true },
+  { label: '低Pスラグ①', x: 20, y: 10, visible: true },
+  { label: '製鋼/低塩基度', x: 40, y: 10, visible: true }
 ];
+
+// 座標変換関数（XY→三角形内の位置）
+const toTriangle = (x, y, size) => {
+  const xCoord = (size * (100 - x - y / 2)) / 100;
+  const yCoord = (size * (y * Math.sqrt(3) / 2)) / 100;
+  return { x: xCoord, y: size - yCoord };
+};
 
 function App() {
   const [points, setPoints] = useState(initialPoints);
-  const [newLabel, setNewLabel] = useState('');
-  const [newX, setNewX] = useState('');
-  const [newY, setNewY] = useState('');
+  const [label, setLabel] = useState('');
+  const [x, setX] = useState('');
+  const [y, setY] = useState('');
 
-  const handleToggleVisibility = (index) => {
-    const updatedPoints = [...points];
-    updatedPoints[index].visible = !updatedPoints[index].visible;
-    setPoints(updatedPoints);
+  const togglePoint = (index) => {
+    const newPoints = [...points];
+    newPoints[index].visible = !newPoints[index].visible;
+    setPoints(newPoints);
   };
 
-  const handleAddPoint = () => {
-    if (newLabel && !isNaN(newX) && !isNaN(newY)) {
-      setPoints([
-        ...points,
-        {
-          label: newLabel,
-          x: parseFloat(newX),
-          y: parseFloat(newY),
-          visible: true,
-        },
-      ]);
-      setNewLabel('');
-      setNewX('');
-      setNewY('');
-    }
+  const addPoint = () => {
+    if (!label || isNaN(x) || isNaN(y)) return;
+    setPoints([...points, { label, x: parseFloat(x), y: parseFloat(y), visible: true }]);
+    setLabel('');
+    setX('');
+    setY('');
   };
+
+  const size = 400;
 
   return (
-    <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>三元系スラグ状態図（CaO–SiO₂–Al₂O₃）</h1>
+    <div style={{ fontFamily: 'sans-serif', padding: '1rem' }}>
+      <h2>三元系スラグ状態図（CaO–SiO₂–Al₂O₃）</h2>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          type="text"
-          placeholder="ラベル"
-          value={newLabel}
-          onChange={(e) => setNewLabel(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="X(%)"
-          value={newX}
-          onChange={(e) => setNewX(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Y(%)"
-          value={newY}
-          onChange={(e) => setNewY(e.target.value)}
-        />
-        <button onClick={handleAddPoint}>追加</button>
+      {/* 入力欄 */}
+      <div>
+        <input value={label} onChange={e => setLabel(e.target.value)} placeholder="ラベル" />
+        <input value={x} onChange={e => setX(e.target.value)} placeholder="X(%)" />
+        <input value={y} onChange={e => setY(e.target.value)} placeholder="Y(%)" />
+        <button onClick={addPoint}>追加</button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        {points.map((pt, idx) => (
-          <label key={idx} style={{ margin: '0 10px' }}>
-            <input
-              type="checkbox"
-              checked={pt.visible}
-              onChange={() => handleToggleVisibility(idx)}
-            />
+      {/* 表示切替 */}
+      <div style={{ margin: '0.5rem 0' }}>
+        {points.map((pt, i) => (
+          <label key={i} style={{ marginRight: '1rem' }}>
+            <input type="checkbox" checked={pt.visible} onChange={() => togglePoint(i)} />
             {pt.label}
           </label>
         ))}
       </div>
 
-      <div
-        style={{
-          position: 'relative',
-          width: '500px',
-          height: '500px',
-          margin: '0 auto',
-          backgroundImage: 'url("/triangle.jpg")',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          border: '1px solid #ccc',
-        }}
-      >
-        {points.map((pt, idx) =>
-          pt.visible ? (
-            <div
-              key={idx}
-              style={{
-                position: 'absolute',
-                left: `${pt.x}%`,
-                top: `${pt.y}%`,
-                transform: 'translate(-50%, -50%)',
-                background: 'blue',
-                color: 'white',
-                padding: '2px 5px',
-                borderRadius: '4px',
-                fontSize: '12px',
-              }}
-            >
-              {pt.label}
-            </div>
-          ) : null
-        )}
-      </div>
+      {/* 三角図 */}
+      <svg width={size + 20} height={size + 20}>
+        <g transform="translate(10,10)">
+          {/* 三角形の輪郭 */}
+          <polygon
+            points={`0,${size} ${size},${size} ${size / 2},0`}
+            fill="#f0f8ff"
+            stroke="#555"
+            strokeWidth="2"
+          />
+
+          {/* 軸ラベル */}
+          <text x="-5" y={size + 10} fontSize="12">SiO₂ (%)</text>
+          <text x={size - 30} y={size + 10} fontSize="12">CaO (%)</text>
+          <text x={size / 2 - 20} y="-5" fontSize="12">Al₂O₃ (%)</text>
+
+          {/* 点プロット */}
+          {points.map((pt, i) => {
+            if (!pt.visible) return null;
+            const { x, y } = toTriangle(pt.x, pt.y, size);
+            return (
+              <g key={i}>
+                <circle cx={x} cy={y} r="6" fill="blue" />
+                <text x={x + 8} y={y + 4} fontSize="12" fill="black">{pt.label}</text>
+              </g>
+            );
+          })}
+        </g>
+      </svg>
     </div>
   );
 }
