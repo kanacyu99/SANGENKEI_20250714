@@ -41,39 +41,42 @@ const App = () => {
         <button onClick={handleAdd}>追加</button>
       </div>
 
-      <svg
-        viewBox="0 0 1 0.866"
-        width="500"
-        height="433"
-        style={{ backgroundColor: 'white', border: '1px solid gray' }}
-      >
-        {/* 三角形エリア */}
-        <polygon points="0,0 1,0 0.5,0.866" fill="#f0f8ff" stroke="black" />
+      {/* 白背景を確実にするためのラッパーdiv */}
+      <div style={{
+        backgroundColor: 'white',
+        display: 'inline-block',
+        border: '1px solid #ccc',
+        padding: '10px',
+      }}>
+        <svg viewBox="0 0 1 0.866" width="500" height="433">
+          {/* 三角形エリア */}
+          <polygon points="0,0 1,0 0.5,0.866" fill="#f0f8ff" stroke="black" />
 
-        {/* 軸ラベル */}
-        <text x="0.5" y="-0.02" textAnchor="middle" fontSize="0.025" transform="translate(0,0.03)">
-          Al₂O₃ (%)
-        </text>
-        <text x="0" y="0.02" fontSize="0.025">
-          SiO₂ (%)
-        </text>
-        <text x="1" y="0.02" textAnchor="end" fontSize="0.025">
-          CaO (%)
-        </text>
+          {/* 軸ラベル */}
+          <text x="0.5" y="-0.02" textAnchor="middle" fontSize="0.025" transform="translate(0,0.03)">
+            Al₂O₃ (%)
+          </text>
+          <text x="0" y="0.02" fontSize="0.025">
+            SiO₂ (%)
+          </text>
+          <text x="1" y="0.02" textAnchor="end" fontSize="0.025">
+            CaO (%)
+          </text>
 
-        {/* プロットデータ */}
-        {points.map((point, index) => {
-          const { x, y } = ternaryToCartesian(point);
-          return (
-            <g key={index}>
-              <circle cx={x} cy={0.866 - y} r="0.01" fill="blue" />
-              <text x={x} y={0.866 - y - 0.015} fontSize="0.02" textAnchor="middle" fill="black">
-                {point.label}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+          {/* 入力データのプロット */}
+          {points.map((point, index) => {
+            const { x, y } = ternaryToCartesian(point);
+            return (
+              <g key={index}>
+                <circle cx={x} cy={0.866 - y} r="0.01" fill="blue" />
+                <text x={x} y={0.866 - y - 0.015} fontSize="0.02" textAnchor="middle" fill="black">
+                  {point.label}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
     </div>
   );
 };
