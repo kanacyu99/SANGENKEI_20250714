@@ -8,11 +8,11 @@ const initialPoints = [
   { label: '製鋼/低塩基度', x: 40, y: 10, visible: true }
 ];
 
-// 座標変換関数（XY→三角形内の位置）
 const toTriangle = (x, y, size) => {
-  const xCoord = (size * (100 - x - y / 2)) / 100;
-  const yCoord = (size * (y * Math.sqrt(3) / 2)) / 100;
-  return { x: xCoord, y: size - yCoord };
+  const h = (Math.sqrt(3) / 2) * size;
+  const xCoord = ((100 - x - y / 2) / 100) * size;
+  const yCoord = h - (y / 100) * h;
+  return { x: xCoord, y: yCoord };
 };
 
 function App() {
@@ -36,12 +36,12 @@ function App() {
   };
 
   const size = 400;
+  const height = (Math.sqrt(3) / 2) * size;
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '1rem' }}>
       <h2>三元系スラグ状態図（CaO–SiO₂–Al₂O₃）</h2>
 
-      {/* 入力欄 */}
       <div>
         <input value={label} onChange={e => setLabel(e.target.value)} placeholder="ラベル" />
         <input value={x} onChange={e => setX(e.target.value)} placeholder="X(%)" />
@@ -49,7 +49,6 @@ function App() {
         <button onClick={addPoint}>追加</button>
       </div>
 
-      {/* 表示切替 */}
       <div style={{ margin: '0.5rem 0' }}>
         {points.map((pt, i) => (
           <label key={i} style={{ marginRight: '1rem' }}>
@@ -59,23 +58,20 @@ function App() {
         ))}
       </div>
 
-      {/* 三角図 */}
-      <svg width={size + 20} height={size + 20}>
-        <g transform="translate(10,10)">
-          {/* 三角形の輪郭 */}
+      <svg width={size + 40} height={height + 40}>
+        <g transform="translate(20,20)">
           <polygon
-            points={`0,${size} ${size},${size} ${size / 2},0`}
+            points={`0,${height} ${size},${height} ${size / 2},0`}
             fill="#f0f8ff"
-            stroke="#555"
+            stroke="#444"
             strokeWidth="2"
           />
 
           {/* 軸ラベル */}
-          <text x="-5" y={size + 10} fontSize="12">SiO₂ (%)</text>
-          <text x={size - 30} y={size + 10} fontSize="12">CaO (%)</text>
-          <text x={size / 2 - 20} y="-5" fontSize="12">Al₂O₃ (%)</text>
+          <text x={-10} y={height + 15} fontSize="12">SiO₂ (%)</text>
+          <text x={size - 30} y={height + 15} fontSize="12">CaO (%)</text>
+          <text x={size / 2 - 25} y={-10} fontSize="12">Al₂O₃ (%)</text>
 
-          {/* 点プロット */}
           {points.map((pt, i) => {
             if (!pt.visible) return null;
             const { x, y } = toTriangle(pt.x, pt.y, size);
